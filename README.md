@@ -72,7 +72,7 @@ To deploy this contract, follow these steps:
 3. Click the "Deploy" button to deploy the contract.
 
 ## Authors
-This contract was developed by [Your Name].
+This contract was developed by Vaibhav Sharma (vaibhavkhandal445@gmail.com).
 
 ## License
 This project is licensed under the MIT License. See the `LICENSE` file for details.
