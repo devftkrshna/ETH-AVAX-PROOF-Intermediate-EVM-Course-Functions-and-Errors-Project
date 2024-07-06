@@ -1,74 +1,95 @@
 # ETH-AVAX-PROOF-Intermediate-EVM-Course-Functions-and-Errors-Project
+
 ## Introduction
-This project implements a BLC voting system using a smart contract written in Solidity. It demonstrates basic voting functionality, including vote casting and determining the winner, while showcasing the use of `require`, `assert`, and `revert` statements for error handling and validation.
+This project implements a School Grading System using a smart contract written in Solidity. It demonstrates basic functionality for managing student grades while showcasing the use of `require`, `assert`, and `revert` statements for error handling and validation.
 
 ## Description
-The BLC Voting System allows users to cast votes for predefined candidates. Each voter can vote only once, and the system ensures that only valid candidates receive votes. The contract also provides a function to determine the winner based on the highest number of votes.
+The School Grading System allows teachers to add students, assign grades to them, and for students to check their grades. The contract ensures that only teachers can perform certain actions and that grades are valid. The contract also includes a function to verify the internal consistency of the system.
 
 ### Key Features:
-- **Vote Casting**: Users can cast a vote for a candidate of their choice. The contract ensures that each voter can vote only once.
-- **Vote Validation**: The contract checks that the candidate being voted for is valid and exists in the list of predefined candidates.
-- **Winner Determination**: The contract includes a function to determine the winner based on the number of votes each candidate receives.
+- **Student Management**: Teachers can add new students to the system.
+- **Grade Assignment**: Teachers can assign grades to students, ensuring the grades are within a valid range.
+- **Grade Checking**: Students can check their assigned grades.
+- **System Consistency**: The contract includes a function to verify that the number of graded students does not exceed the total number of students.
 
 ### Functions:
-1. **Constructor**: 
-   - `constructor(string[] memory _candidates)`: Initializes the contract with a list of candidates. The candidates are passed as an array of strings.
+1. **Constructor**:
+   - `constructor(address[] memory initialTeachers)`: Initializes the contract with a list of teachers.
 
-2. **castVote**:
-   - `function castVote(string memory _candidate) public`: Allows a user to cast a vote for a specified candidate.
+2. **addStudent**:
+   - `function addStudent(address _studentAddress, string memory _name) public`: Allows a teacher to add a student.
    - **require statements**:
-     - Ensures that the voter has not already voted.
-     - Ensures that the candidate is valid.
+     - Ensures that the student does not already exist.
    - **Process**:
-     - Checks if the voter has already voted by verifying the `hasVoted` mapping.
-     - Validates the candidate by checking against the list of predefined candidates.
-     - Increments the vote count for the valid candidate.
-     - Marks the voter as having voted by updating the `hasVoted` mapping.
-     - Emits a `VoteCast` event with the voter's address and the candidate's name.
+     - Adds the student to the `students` mapping with initial grade values.
 
-3. **getWinner**:
-   - `function getWinner() public view returns (string memory)`: Returns the candidate with the most votes.
-   - **assert statement**:
-     - Ensures that there is at least one candidate in the system.
+3. **assignGrade**:
+   - `function assignGrade(address _studentAddress, uint8 _grade) public`: Allows a teacher to assign a grade to a student.
+   - **require statements**:
+     - Ensures that the student exists.
+     - Ensures that the grade is valid.
    - **Process**:
-     - Iterates over the list of candidates to find the candidate with the highest number of votes.
-     - Returns the name of the candidate with the most votes.
+     - Updates the student's grade and marks them as graded.
+     - Emits a `GradeAssigned` event with the student's address and grade.
+
+4. **checkGrade**:
+   - `function checkGrade() public view returns (string memory name, uint8 grade)`: Allows students to check their grades.
+   - **require statements**:
+     - Ensures that the student exists.
+     - Ensures that the grade has been assigned.
+   - **Process**:
+     - Returns the student's name and grade.
+
+5. **withdrawGrade**:
+   - `function withdrawGrade(address _studentAddress) public`: Allows a teacher to withdraw a student's grade.
+   - **revert statements**:
+     - Reverts if the student does not exist.
+   - **Process**:
+     - Resets the student's grade and graded status.
+
+6. **checkConsistency**:
+   - `function checkConsistency(address[] memory studentAddresses) public view`: Checks the internal consistency of the contract.
+   - **assert statements**:
+     - Ensures that the number of graded students does not exceed the total number of students.
+   - **Process**:
+     - Iterates through the list of student addresses to count graded students and ensures the consistency of the data.
 
 ### Error Handling:
-- **require()**: Used to validate conditions that must be true for the function to execute. In this contract, `require` statements ensure that a voter can only vote once and that votes are cast for valid candidates.
-- **assert()**: Used to check for conditions that should never be false. In this contract, `assert` ensures that there is at least one candidate when determining the winner.
+- **require()**: Used to validate conditions that must be true for the function to execute. In this contract, `require` statements ensure valid operations, such as unique students and valid grades.
+- **revert()**: Used to handle conditions where an operation cannot proceed. In this contract, `revert` is used in the `withdrawGrade` function to handle non-existent students.
+- **assert()**: Used to check for conditions that should never be false. In this contract, `assert` ensures the internal consistency of the student data.
 
 ### Events:
-- **VoteCast**: 
-  - `event VoteCast(address indexed voter, string candidate)`: Emitted when a vote is cast, recording the voter's address and the candidate's name.
+- **GradeAssigned**:
+  - `event GradeAssigned(address indexed student, uint8 grade)`: Emitted when a grade is assigned, recording the student's address and the grade.
 
 ## Contract Details
 The contract consists of the following main components:
 
 - **Mappings**:
-  - `votes`: A mapping from candidate names (strings) to their respective vote counts (uint).
-  - `hasVoted`: A mapping from voter addresses to their voting status (bool), indicating whether the voter has cast their vote.
-
-- **Array**:
-  - `candidates`: An array of candidate names (strings).
+  - `students`: A mapping from student addresses to their details (`Student` struct).
+  - `teachers`: A mapping from teacher addresses to their status, indicating whether the address belongs to a teacher.
 
 - **Constructor**:
-  - Initializes the list of candidates and sets initial vote counts to 0.
+  - Initializes the list of teachers.
 
 - **Functions**:
-  - `castVote`: Allows a voter to cast their vote for a valid candidate, updating the vote count and marking the voter as having voted.
-  - `getWinner`: Determines and returns the candidate with the most votes.
+  - `addStudent`: Allows a teacher to add a student.
+  - `assignGrade`: Allows a teacher to assign a grade to a student.
+  - `checkGrade`: Allows students to check their grades.
+  - `withdrawGrade`: Allows a teacher to withdraw a student's grade.
+  - `checkConsistency`: Ensures the internal consistency of the contract data.
 
 ## Deployment
 To deploy this contract, follow these steps:
 1. Open [Remix IDE](https://remix.ethereum.org/).
-2. Create a new file named `BLCvotingSystem.sol` and paste the contract code into it.
+2. Create a new file named `SchoolGradingSystem.sol` and paste the contract code into it.
 3. Compile the contract using the Solidity compiler.
-4. Deploy the contract by specifying the list of candidates as an array of strings in the deployment parameters.
+4. Deploy the contract by specifying the list of teacher addresses as an array of addresses in the deployment parameters.
 
 ### Example Deployment:
 1. In Remix IDE, after pasting the contract code and compiling it, go to the "Deploy & Run Transactions" tab.
-2. In the "Deploy" section, enter the candidates in the "constructor parameters" field as an array of strings. For example: `["Candidate A", "Candidate B", "Candidate C"]`.
+2. In the "Deploy" section, enter the teacher addresses in the "constructor parameters" field as an array. For example: `["0xAbc123...", "0xDef456..."]`.
 3. Click the "Deploy" button to deploy the contract.
 
 ## Authors
